@@ -14,13 +14,13 @@ jobs:
       - run:
           name: run tests
           command: |
-            poetry run pytest --junitxml=reports/junit/junit.xml tests ;
-            poetry run genbadge tests -o badges/tests.svg
+            poetry run coverage run -m --branch pytest --junitxml=reports/junit/junit.xml tests && \
+            poetry run coverage xml -o reports/coverage/coverage.xml
       - run:
-          name: get coverage
+          name: get badges
           command: |
-            poetry run coverage xml -o reports/coverage/coverage.xml ;
             poetry run genbadge coverage -o badges/coverage.svg
+            poetry run genbadge tests -o badges/tests.svg
 
       - store_artifacts:
           path: reports
