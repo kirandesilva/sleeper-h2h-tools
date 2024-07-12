@@ -15,7 +15,7 @@ jobs:
       - run:
           name: checkout main branch
           command: |
-            git clone https://github.com/kirandesilva/sleeper-h2h-tools.git
+            git clone -b init https://github.com/kirandesilva/sleeper-h2h-tools.git .
 
       - python/install-packages:
           pkg-manager: poetry
@@ -36,13 +36,15 @@ jobs:
           name: checkout badges branch
           command: |
             mkdir ../badge_dir
-            cd ../badge_dir
-            git clone -b badges https://github.com/kirandesilva/sleeper-h2h-tools.git
+            git clone -b badges https://github.com/kirandesilva/sleeper-h2h-tools.git ../badge_dir
 
       - run:
           name: push badges
           command: |
-            cp -r "$CIRCLE_WORKING_DIRECTORY"/badges/ .
+            cd ../badge_dir
+            cp -r /home/circleci/project/badges/ .
+            git config --global user.email "kiran.desilva@yahoo.com"
+            git config --global user.name "Kiran de Silva"
             git add *.svg
             git commit -s -m "CircleCI Build: New badges rendered"
             git push -q "$CIRCLE_REPOSITORY_URL" badges
