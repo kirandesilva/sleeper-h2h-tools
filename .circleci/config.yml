@@ -15,7 +15,7 @@ jobs:
       - run:
           name: checkout main branch
           command: |
-            git clone "$CIRCLE_REPOSITORY_URL"
+            git clone https://github.com/kirandesilva/sleeper-h2h-tools.git
 
       - python/install-packages:
           pkg-manager: poetry
@@ -37,7 +37,7 @@ jobs:
           command: |
             mkdir ../badge_dir
             cd ../badge_dir
-            git clone -b badges "$CIRCLE_REPOSITORY_URL"
+            git clone -b badges https://github.com/kirandesilva/sleeper-h2h-tools.git
 
       - run:
           name: push badges
