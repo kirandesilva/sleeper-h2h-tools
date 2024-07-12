@@ -52,6 +52,9 @@ jobs:
             git push -q "$CIRCLE_REPOSITORY_URL" badges
 
       - store_test_results:
+          path: reports/junit
+
+      - store_artifacts:
           path: reports
 
       - store_artifacts:
