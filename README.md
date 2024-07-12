@@ -1,4 +1,5 @@
-![GitHub](https://img.shields.io/github/license/kirandesilva/sleeper-h2h-tools.svg?color=blue)
+[![GitHub](https://img.shields.io/github/license/kirandesilva/sleeper-h2h-tools.svg?color=blue)](https://github.com/kirandesilva/sleeper-h2h-tools/blob/main/LICENSE)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/kirandesilva/sleeper-h2h-tools/tree/main.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/kirandesilva/sleeper-h2h-tools/tree/main)
 
 
 # sleeper-h2h-tools

@@ -8,21 +8,46 @@ jobs:
       tag: '3.10'
 
     steps:
-      - checkout
+      - run:
+          name: checkout main branch
+          command: |
+            git clone "$CIRCLE_REPOSITORY_URL"
+
       - python/install-packages:
           pkg-manager: poetry
+
       - run:
           name: run tests
           command: |
             poetry run coverage run -m --branch pytest --junitxml=reports/junit/junit.xml tests && \
             poetry run coverage xml -o reports/coverage/coverage.xml
+
       - run:
           name: get badges
           command: |
             poetry run genbadge coverage -o badges/coverage.svg
             poetry run genbadge tests -o badges/tests.svg
 
-      - store_artifacts:
+      - run:
+          name: checkout badges branch
+          command: |
+            mkdir ../badge_dir
+            cd ../badge_dir
+            git clone -b badges "$CIRCLE_REPOSITORY_URL"
+
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:sfLoupFy0Fvan+pZ6H1k/mhz+/RDd2+jslA8RevbKSA"
+
+      - run:
+          name: push badges
+          command: |
+            cp -r "$CIRCLE_WORKING_DIRECTORY"/badges/ .
+            git add *.svg
+            git commit -s -m "CircleCI Build: New badges rendered"
+            git push -q "$CIRCLE_REPOSITORY_URL" badges
+
+      - store_test_results:
           path: reports
 
       - store_artifacts:
