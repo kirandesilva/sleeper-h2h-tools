@@ -8,6 +8,10 @@ jobs:
       tag: '3.10'
 
     steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:sfLoupFy0Fvan+pZ6H1k/mhz+/RDd2+jslA8RevbKSA"
+
       - run:
           name: checkout main branch
           command: |
@@ -34,10 +38,6 @@ jobs:
             mkdir ../badge_dir
             cd ../badge_dir
             git clone -b badges "$CIRCLE_REPOSITORY_URL"
-
-      - add_ssh_keys:
-          fingerprints:
-            - "SHA256:sfLoupFy0Fvan+pZ6H1k/mhz+/RDd2+jslA8RevbKSA"
 
       - run:
           name: push badges
