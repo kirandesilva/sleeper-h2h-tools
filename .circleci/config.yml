@@ -25,7 +25,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            poetry run coverage run -m --branch pytest --junitxml=reports/junit/junit.xml tests && \
+            poetry run coverage run -m --branch --source=. pytest --junitxml=reports/junit/junit.xml tests && \
             poetry run coverage xml -o reports/coverage/coverage.xml
 
       - run:
