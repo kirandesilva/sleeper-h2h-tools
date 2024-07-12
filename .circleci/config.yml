@@ -14,7 +14,7 @@ jobs:
       - run: # install make and resolve hosts for SSH cloning
           name: prepare environment
           command: |
-            apt-get -y install make
+            sudo apt-get -y install make
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
 
@@ -72,7 +72,7 @@ jobs:
       - run: # install make and resolve hosts for SSH cloning
           name: prepare environment
           command: |
-            apt-get -y install make
+            sudo apt-get -y install make
             mkdir -p ~/.ssh
             ssh-keyscan github.com >> ~/.ssh/known_hosts
 
@@ -101,12 +101,12 @@ workflows:
   build:
     jobs:
       - build-test:
-        filters:
-          branches:
-            ignore:
-              - main
-              - badges
+          filters:
+            branches:
+              ignore:
+                - main
+                - badges
       - build-test-deploy:
-        filters:
-          branches:
-            only: main
+          filters:
+            branches:
+              only: main
