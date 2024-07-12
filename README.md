@@ -1,6 +1,7 @@
 [![GitHub](https://img.shields.io/github/license/kirandesilva/sleeper-h2h-tools.svg?color=blue)](https://github.com/kirandesilva/sleeper-h2h-tools/blob/main/LICENSE)
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/kirandesilva/sleeper-h2h-tools/tree/main.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/kirandesilva/sleeper-h2h-tools/tree/main)
-
+![coverage](https://raw.githubusercontent.com/kirandesilva/sleeper-h2h-tools/badges/badges/coverage.svg)
+![tests](https://raw.githubusercontent.com/kirandesilva/sleeper-h2h-tools/badges/badges/tests.svg)
 
 # sleeper-h2h-tools
 A niche Python API for calculating head-to-head metrics in Sleeper Fantasy Football leagues and delivering them through Discord webhook requests
@@ -53,6 +54,10 @@ from sleeper_h2h import graphics
 img_path = 'img.png'
 graphics.draw_h2h_plot(std.h2h_board_df, img_path)
 ```
+Will return an image looking like this:
+
+![readme-img](https://github.com/user-attachments/assets/b45c2008-14a4-4b99-8a42-4b2bb225375d)
+
 ## Discord
 ```python
 from sleeper_h2h import discord, utils
