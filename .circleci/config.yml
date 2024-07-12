@@ -48,7 +48,7 @@ jobs:
             git config --global user.email "kiran.desilva@yahoo.com"
             git config --global user.name "Kiran de Silva"
             git add *.svg
-            git commit -s -m "CircleCI Build: New badges rendered"
+            git commit --allow-empty -s -m "CircleCI Build: New badges rendered"
             git push -q "$CIRCLE_REPOSITORY_URL" badges
 
       - store_test_results:
