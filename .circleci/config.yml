@@ -1,38 +1,35 @@
 version: '2.1'
-orbs:
-  python: circleci/python@2.1.1
+
 jobs:
-  build:
-    executor:
-      name: python/default
-      tag: '3.10'
+  build-test-deploy:
+    docker:
+      - image: cimg/python:3.10.14
+    resource_class: small
 
     steps:
       - add_ssh_keys:
           fingerprints:
             - "SHA256:sfLoupFy0Fvan+pZ6H1k/mhz+/RDd2+jslA8RevbKSA"
 
-      - run:
-          name: checkout main branch
+      - run: # install make and resolve hosts for SSH cloning
+          name: prepare environment
           command: |
-            mkdir -p ~/.ssh
-            ssh-keyscan github.com >> ~/.ssh/known_hosts
-            git clone -b init "$CIRCLE_REPOSITORY_URL" .
+          apt-get -y install make
+          mkdir -p ~/.ssh
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - run:
+          name: checkout current branch
+          command: |
+            git clone -b "$CIRCLE_BRANCH" "$CIRCLE_REPOSITORY_URL" .
 
       - python/install-packages:
           pkg-manager: poetry
 
       - run:
-          name: run tests
+          name: get coverage and badges
           command: |
-            poetry run coverage run -m --branch --source=. pytest --junitxml=reports/junit/junit.xml tests && \
-            poetry run coverage xml -o reports/coverage/coverage.xml
-
-      - run:
-          name: get badges
-          command: |
-            poetry run genbadge coverage -o badges/coverage.svg
-            poetry run genbadge tests -o badges/tests.svg
+            make coverage_dump_and_badge
 
       - run:
           name: checkout badges branch
@@ -60,7 +57,52 @@ jobs:
       - store_artifacts:
           path: badges
 
+  build-test:
+    docker:
+      - image: cimg/python:3.10.14
+    resource_class: small
+
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:sfLoupFy0Fvan+pZ6H1k/mhz+/RDd2+jslA8RevbKSA"
+
+      - run: # install make and resolve hosts for SSH cloning
+          name: prepare environment
+          command: |
+          apt-get -y install make
+          mkdir -p ~/.ssh
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - run:
+          name: checkout current branch
+          command: |
+            git clone -b "$CIRCLE_BRANCH" "$CIRCLE_REPOSITORY_URL" .
+
+      - python/install-packages:
+          pkg-manager: poetry
+
+      - run:
+          name: get coverage
+          command: |
+            make coverage_dump_xml
+
+      - store_test_results:
+          path: reports/junit
+
+      - store_artifacts:
+          path: reports
+
 workflows:
-  main:
+  build:
     jobs:
-      - build
+      - build-test:
+        filters:
+          branches:
+            ignore:
+              - main
+              - badges
+      - build-test-deploy:
+        filters:
+          branches:
+            only: main

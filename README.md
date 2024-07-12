@@ -72,7 +72,7 @@ discord.send_text(hook, utils.stringify_h2h_df(std.h2h_standings_df))
 # Dependencies
 
 ## Python Version
-**> 3.10** required : see below for a list of critical versioned features included in this library
+**>= 3.10** required : see below for a list of critical versioned features included in this library
 - **3.10** : union type hints using pipe `|` character
 - **3.7** : dataclasses
 - **3.5** : type hints
@@ -82,8 +82,6 @@ discord.send_text(hook, utils.stringify_h2h_df(std.h2h_standings_df))
 ## External Libraries
 
 **discord-webhook** : [GitHub](https://github.com/lovvskillz/python-discord-webhook) | [PyPI](https://pypi.org/project/discord-webhook/)
-
-**jupyter** : [Docs](https://docs.jupyter.org/en/latest/) | [GitHub](https://github.com/jupyter/jupyter) | [PyPI](https://pypi.org/project/jupyter/)
 
 **kaleido** : [GitHub](https://github.com/plotly/Kaleido) | [PyPI](https://pypi.org/project/kaleido/)
 
@@ -98,15 +96,19 @@ discord.send_text(hook, utils.stringify_h2h_df(std.h2h_standings_df))
 <a name="development"></a>
 
 # Development
-The following command installs all package dependencies and the project library:
+The following command installs all non-testing package dependencies and the project library:
 ```bash
 poetry install
 ```
-If you want to install just the dependencies and not the project itself, you can use:
+To do the same except without installing the project library, use:
 ```bash
 poetry install --no-root
 ```
-See the `poetry` documentation for a full list of commands [here](https://python-poetry.org/docs/).
+To install all dependencies including those only required for testing, use:
+```bash
+poetry install --with test
+```
+This is typically all that is required to continue to testing. Otherwise, see the `poetry` documentation for a full list of commands [here](https://python-poetry.org/docs/).
 
 <a name="license"></a>
 
