@@ -2,7 +2,6 @@
 Unit tests which depend on instantiating a Standings object
 """
 
-import os
 import unittest
 
 from sleeper_h2h import graphics, utils
