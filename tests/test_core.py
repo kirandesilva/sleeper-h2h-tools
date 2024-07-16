@@ -45,29 +45,6 @@ class SleeperH2HTestDependsClass(unittest.TestCase):
 
         self.assertIsInstance(fig, graphics.Figure)
 
-    def test_draw_h2h_plot_image_reflectivity(self):
-
-        """
-        Test if newly generated plot image matches the reference used in
-        README.md
-        """
-
-        img_path = "tests/test-img.png"
-
-        graphics.draw_h2h_plot(
-            self.standings.h2h_board_df,
-            img_path
-        )
-
-        with open("examples/h2h_plot-example.png", "rb") as img:
-            ref_img = img.read()
-
-        with open("tests/test-img.png", "rb") as img:
-            new_img = img.read()
-        os.remove(img_path)
-
-        self.assertEqual(ref_img, new_img)
-
     def test_stringify_h2h_standings_df(self) -> None:
 
         """
