@@ -56,7 +56,10 @@ def send_image(webhook_url: str, content_path: str) -> Response:
     with open(content_path, "rb") as img:
         webhook.add_file(file=img.read(), filename=filename)
 
-    embed = DiscordEmbed(url=webhook_url, title="A new H2H board has been generated!")
+    embed = DiscordEmbed(
+        url=webhook_url,
+        title="A new H2H board has been generated!"
+    )
     embed.set_image(url=f"attachment://{filename}")
     webhook.add_embed(embed)
     response = webhook.execute()

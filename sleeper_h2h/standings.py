@@ -17,12 +17,39 @@ class Metadata:
 
     """
     Stores metadata for the Standings class in order to reduce attribute burden
+
+    ATTRIBUTES
+    ----------
+    __league_id : int | str
+        the ID of the Sleeper Fantasy Football league
+
+    league : League, default=None
+        `League` object instance
+
+    __rosters : list[dict], default=[]
+        `League.get_rosters()` instance
+
+    __users : list[dict], default=[]
+        `League.get_users()` instance
+
+    standings : list[tuple], default=[]
+        `League.get_standings()` instance; the return type hint provided by
+        the sleeper_wrapper library is incorrect, but its docstring is
+
+    user_id_team_map : dict, default={}
+        Dictionary mapping user ID to team name; essentially merges the returns
+        of `League.map_rosterid_to_ownerid()` and
+        `League.map_users_to_team_name()`
+
+    week : int, default=None
+        the current week of the season; simply wins + losses + 1 for the first
+        place team
     """
 
-    _league_id: int | str
+    __league_id: int | str
     league: League = field(init=False, default=None)
-    _rosters: list[dict] = field(init=False, default_factory=list)
-    _users: list[dict] = field(init=False, default_factory=list)
+    __rosters: list[dict] = field(init=False, default_factory=list)
+    __users: list[dict] = field(init=False, default_factory=list)
     standings: list[tuple] = field(init=False, default_factory=list)
     user_id_team_map: dict = field(init=False, default_factory=dict)
     week: int = field(init=False, default_factory=int)
@@ -33,17 +60,18 @@ class Metadata:
         Initialize League metadata attributes
         """
 
-        self.league = League(self._league_id)
-        self._rosters = self.league.get_rosters()
-        self._users = self.league.get_users()
+        self.league = League(self.__league_id)
+        self.__rosters = self.league.get_rosters()
+        self.__users = self.league.get_users()
         self.standings = self.league.get_standings(
-            self._rosters,
-            self._users
+            self.__rosters,
+            self.__users
         )
         self.user_id_team_map = utils.merge_users_and_teams(
-            self.league.map_rosterid_to_ownerid(self._rosters),
-            self.league.map_users_to_team_name(self._users)
+            self.league.map_rosterid_to_ownerid(self.__rosters),
+            self.league.map_users_to_team_name(self.__users)
         )
+
 
 @dataclass
 class Standings:
@@ -51,10 +79,57 @@ class Standings:
     """
     A class representing a League's standings according to head-to-head
     tiebreaker rules
+
+    ATTRIBUTES
+    ----------
+    league_id : int | str
+        the ID of the Sleeper Fantasy Football league
+
+    _metadata : Metadata, default=None
+        `Metadata` object instance
+
+    _standings_df : DataFrame, default=DataFrame()
+        DataFrame of the current standings, sorted by wins then points; this is
+        generated entirely by the `sleeper_wrapper` library which uses rounding
+        for points
+
+    standings_df : DataFrame, default=DataFrame()
+        DataFrame of the current standings, sorted by wins then points; this
+        uses `_standings_df` as a reference but instead calculates points by
+        iterating over weekly matchups, resulting in no rounding
+
+    h2h_board_df : DataFrame, default=DataFrame()
+        DataFrame of the head-to-head winrate board; read rowwise, each cell
+        represents the winrate of the row index's team against teams in the
+        columns; points are in the last column
+
+    h2h_standings_df : DataFrame, default=DataFrame()
+        DataFrame of the current standings, sorted by wins, then head-to-head
+        rules, then points; copy of `standings_df` and modified it according to
+        `h2h_board_df`
+    
+    METHODS
+    -------
+    __get_standings_df_rounded_points(standings)
+        returns a DataFrame of the current standings with rounded points;
+        assigns `_standings_df`
+
+    _get_standings_df_exact_points()
+        returns a DataFrame of the current standings with exact points;
+        assigns `standings_df`
+
+    make_h2h_board_df()
+        generates head-to-head winrate DataFrame from class instance;
+        assigns `h2h_board_df`
+
+    make_h2h_standings_df()
+        generates a DataFrame of the current standings with head-to-head
+        adjustments applied; assigns `h2h_standings_df`
+
     """
 
     league_id: int | str
-    _metadata: Metadata = field(init=False, default=None)
+    _metadata: Metadata = field(default=None)
     _standings_df: DataFrame = field(init=False, default_factory=DataFrame)
     standings_df: DataFrame = field(init=False, default_factory=DataFrame)
     h2h_board_df: DataFrame = field(init=False, default_factory=DataFrame)
@@ -63,10 +138,12 @@ class Standings:
     def __post_init__(self) -> None:
 
         """
-        Initialize the Metadata object
+        Initialize the Metadata object and rounded standings generated purely
+        by `sleeper_wrapper`
         """
 
-        self._metadata = Metadata(self.league_id)
+        if not self._metadata:
+            self._metadata = Metadata(self.league_id)
         self._standings_df = self.__get_standings_df_rounded_points(
             self._metadata.standings
         )
@@ -77,8 +154,11 @@ class Standings:
         ) -> DataFrame:
 
         """
-        Generates a DataFrame directly from `League.get_standings()` which
+        Returns a DataFrame directly from `League.get_standings()` which
         uses integer rounding for point calculations
+
+        This method should only be internally called by `__post_init__()` and
+        it assigns the attribute `self._standings_df`
         """
 
         df = DataFrame(standings, columns=["team", "wins", "losses", "points"])
@@ -89,13 +169,14 @@ class Standings:
 
         return df
 
-    def _get_standings_df_exact_points(self) -> None:
+    def _get_standings_df_exact_points(self) -> DataFrame:
 
         """
-        Generates a DataFrame representation of `League.get_standings()` but
-        without any rounding for point calculations
+        Returns a DataFrame representation of `League.get_standings()` but
+        without any rounding for point calculations; achieved by iterating over
+        weekly matchups
 
-        Achieved by iterating over weekly matchups
+        This is internally called by `self.make_h2h_board_df()`
         """
 
         user_id_df = DataFrame(
@@ -148,6 +229,7 @@ class Standings:
 
     def make_h2h_board_df(self) -> None:
         # pylint: disable=E1136,E1137
+        # disable unsubscriptable and unsupported assignment pylint errors
 
         """
         Generates a DataFrame representing the head-to-head breakdown of a
@@ -161,7 +243,9 @@ class Standings:
         Assigns attributes `self.standings_df` and `self.h2h_board_df`
         """
 
-        self.standings_df = self._get_standings_df_exact_points()
+        if self.standings_df.empty:
+            self.standings_df = self._get_standings_df_exact_points()
+
         wr_df = DataFrame(columns=["winners", "losers"])
 
         for j in range(1, self._metadata.week):
@@ -240,6 +324,9 @@ class Standings:
 
         Assigns attribute `self.h2h_standings_df`
         """
+
+        if self.h2h_board_df.empty:
+            self.make_h2h_board_df()
 
         h2h_board_df = self.h2h_board_df.copy(deep=True)
         standings_df = self.standings_df.copy(deep=True)

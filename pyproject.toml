@@ -27,9 +27,18 @@ sleeper-api-wrapper = "1.1.0"
 optional = true
 
 [tool.poetry.group.test.dependencies]
-coverage = "6.4.0"
-pytest = "7.4.0"
+coverage = "^6.4.0"
+pytest = "^7.4.0"
 genbadge = {extras = ["coverage", "tests"], version = "^1.1.1"}
+
+[tool.coverage.run]
+branch = true
+source = ["."]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
 
 [build-system]
 requires = ["poetry-core"]

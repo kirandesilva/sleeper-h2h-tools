@@ -75,7 +75,7 @@ def merge_users_and_teams(dict_1: dict, dict_2: dict) -> dict:
     return df_1.merge(df_2, on="merge").set_index("keys")["values"]\
         .apply(remove_emojis).to_dict()
 
-def stringify_h2h_df(df: DataFrame) -> str:
+def stringify_h2h_standings_df(df: DataFrame) -> str:
 
     """
     Parses an h2h DataFrame from a Standings object into a pretty string
