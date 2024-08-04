@@ -414,7 +414,7 @@ graphics.draw_h2h_plot(std.h2h_board_df, img_path).show()
 
 It should be read like a DataFrame, where each row represents a team's winrate against other teams. Green indicates a winrate above .500 for a given head-to-head matchup, red indicates below .500, and yellow indicates exactly .500.
 
-In this example, Aardvarks have a perfect winrate against all other teams except Cicadas and Echidnas.
+In this example, Foxes have a perfect winrate against all other teams except Beavers and Aardvarks.
 
 ### Known Limitation
 
